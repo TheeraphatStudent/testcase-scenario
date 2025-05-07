@@ -60,7 +60,6 @@ const TestCaseForm: React.FC<TestCaseFormProps> = ({ initialData, onClose, onSav
       const querySnapshot = await getCollection('testCases')
 
       const existingCases = querySnapshot
-        .map(doc => doc.data())
         .filter(tc => tc.groupId === selectedGroup);
 
       const number = (existingCases.length + 1).toString().padStart(6, '0');
@@ -117,10 +116,10 @@ const TestCaseForm: React.FC<TestCaseFormProps> = ({ initialData, onClose, onSav
         beforeTestImages: beforeImages,
         afterTestImages: afterImages,
         createdAt: mode === 'create' ? new Date().toISOString() : initialData!.createdAt,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
-      await onSave(testCaseData);
+      onSave(testCaseData);
       onClose();
     } catch (error) {
       console.error('Error saving test case:', error);

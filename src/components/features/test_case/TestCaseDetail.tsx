@@ -1,19 +1,29 @@
 import React, { useState } from 'react';
 import { TestCase } from '../../../types/TestCase';
 import TestCaseForm from './TestCaseForm';
+import { updateDocument } from '../../../utils/hooks/useFirebaseDB';
 
 interface TestCaseDetailProps {
   testCase: TestCase;
   onClose: () => void;
-  onUpdate: (updatedTestCase: TestCase) => void;
+  onTestCaseUpdated: () => void;
 }
 
-const TestCaseDetail: React.FC<TestCaseDetailProps> = ({ testCase, onClose, onUpdate }) => {
+const TestCaseDetail: React.FC<TestCaseDetailProps> = ({ testCase, onClose, onTestCaseUpdated }) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleSave = async (updatedTestCase: TestCase) => {
-    onUpdate(updatedTestCase);
-    setIsEditing(false);
+    try {
+      await updateDocument({
+        collectionName: 'testCases',
+        data: updatedTestCase
+      });
+      onTestCaseUpdated();
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating test case:', error);
+      alert('Failed to update test case. Please try again.');
+    }
   };
 
   if (isEditing) {

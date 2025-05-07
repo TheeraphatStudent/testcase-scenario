@@ -1,5 +1,6 @@
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { setSessionItem } from "../useSession";
+import { createDocument, getDocumentById } from "./useFirebaseDB";
 
 export const googleLogin = async () => {
   try {
@@ -12,6 +13,23 @@ export const googleLogin = async () => {
     const credential = GoogleAuthProvider.credentialFromResult(result);
     const token = credential?.accessToken;
     const user = result.user;
+
+    const userData = await getDocumentById({
+      collectionName: "users",
+      id: user.uid
+    })
+
+    if (!userData) {
+      await createDocument({
+        collectionName: "users",
+        data: {
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          id: user.uid
+        }
+      })
+    }
     
     setSessionItem({
       name: 'user',
@@ -31,8 +49,3 @@ export const googleLogin = async () => {
     return { success: false, error };
   }
 };
-
-export const logout = async () => {
-  
-
-}

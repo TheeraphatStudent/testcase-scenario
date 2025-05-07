@@ -113,27 +113,6 @@ function HomePage() {
     });
   };
 
-  const onCreateTestCase = async (newTestCase: TestCase) => {
-    try {
-      await createDocument({
-        collectionName: 'testCases',
-        data: newTestCase
-      });
-      await fetchTestCases();
-    } catch (error) {
-      console.error('Error saving test case:', error);
-      alert('Failed to save test case. Please try again.');
-    }
-  };
-
-  const onUpdateTestCase = async (updatedTestCase: TestCase) => {
-    await updateDocument({
-      collectionName: 'testCases',
-      data: updatedTestCase
-    });
-    await fetchTestCases();
-  };
-
   const handleGroupClick = (group: GroupDataProps) => {
     setSelectedGroup(group);
     setIsEditGroupModalOpen(true);
@@ -232,14 +211,14 @@ function HomePage() {
         <TestCaseDetail
           testCase={selectedTestCase}
           onClose={handleCloseDetail}
-          onUpdate={onUpdateTestCase}
+          onTestCaseUpdated={fetchTestCases}
         />
       )}
 
       {isCreateModalOpen && (
         <CreateTestCase
           onClose={() => setIsCreateModalOpen(false)}
-          onSave={onCreateTestCase}
+          onTestCaseCreated={fetchTestCases}
         />
       )}
 

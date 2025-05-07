@@ -1,13 +1,28 @@
 import React from 'react';
 import { TestCase } from '../../../types/TestCase';
 import TestCaseForm from './TestCaseForm';
+import { createDocument } from '../../../utils/hooks/useFirebaseDB';
 
 interface CreateTestCaseProps {
   onClose: () => void;
-  onSave: (testCase: TestCase) => void;
+  onTestCaseCreated: () => void;
 }
 
-const CreateTestCase: React.FC<CreateTestCaseProps> = ({ onClose, onSave }) => {
+const CreateTestCase: React.FC<CreateTestCaseProps> = ({ onClose, onTestCaseCreated }) => {
+  const handleSave = async (testCase: TestCase) => {
+    try {
+      await createDocument({
+        collectionName: 'testCases',
+        data: testCase
+      });
+      onTestCaseCreated();
+      onClose();
+    } catch (error) {
+      console.error('Error saving test case:', error);
+      alert('Failed to save test case. Please try again.');
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -23,7 +38,7 @@ const CreateTestCase: React.FC<CreateTestCaseProps> = ({ onClose, onSave }) => {
 
         <TestCaseForm
           onClose={onClose}
-          onSave={onSave}
+          onSave={handleSave}
           mode="create"
         />
       </div>
