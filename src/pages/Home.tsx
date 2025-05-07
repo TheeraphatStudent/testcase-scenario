@@ -17,6 +17,7 @@ import { Navbar } from '../components/Navbar';
 import Search from '../components/Search';
 import Footer from '../components/Footer';
 import { showToast } from '../utils/toast';
+import { Seggested } from '../components/Seggested';
 
 function HomePage() {
   const [testCases, setTestCases] = useState<TestCase[]>([]);
@@ -213,6 +214,8 @@ function HomePage() {
           />
         </section>
       </main>
+
+      <Seggested />
 
       {selectedTestCase && (
         <TestCaseDetail

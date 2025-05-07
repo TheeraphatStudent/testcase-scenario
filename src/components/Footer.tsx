@@ -12,6 +12,10 @@ const Footer: React.FC = () => {
     setGithubInfo(response)
   }
 
+  const onReportIssue = () => {
+    window.open('https://github.com/TheeraphatStudent/TCM/issues', '_blank')
+  }
+
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + window.innerHeight;
@@ -51,6 +55,14 @@ const Footer: React.FC = () => {
               <img src={githubInfo?.avatar_url} alt="github" className='w-10 h-10 rounded-full' />
               <span className='text-gray-300'>{githubInfo?.name}</span>
             </div>
+          </div>
+
+          <div className="flex gap-12 mt-8 pt-8 border-t border-gray-700 text-center text-gray-300">
+            <button onClick={onReportIssue} className="relative inline-flex items-center justify-center p-0.5 overflow-hidden text-sm font-medium rounded-lg group bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 group-hover:from-gray-600 group-hover:via-gray-700 group-hover:to-gray-800 dark:text-white focus:ring-4 focus:outline-none focus:ring-gray-500">
+              <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 text-gray-300 dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent hover:text-white">
+                รายงานปัญหา
+              </span>
+            </button>
           </div>
 
           <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-300">
