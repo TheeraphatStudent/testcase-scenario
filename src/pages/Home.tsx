@@ -9,11 +9,12 @@ import CreateTestCase from '../components/features/test_case/CreateTestCase';
 import CreateGroup from '../components/features/group/CreateGroup';
 import EditGroup from '../components/features/group/EditGroup';
 import { exportToExcel } from '../utils/excelExport';
-import { Search, Plus, FolderPlus } from 'lucide-react';
+import { Plus, FolderPlus } from 'lucide-react';
 import { createDocument, getCollection, updateDocument } from '../utils/hooks/useFirebaseDB';
 import GroupList from '../components/features/group/GroupList';
 import { GroupDataProps } from '../types/Group';
 import { Navbar } from '../components/Navbar';
+import Search from '../components/Search';
 
 function HomePage() {
   const [testCases, setTestCases] = useState<TestCase[]>([]);
@@ -36,9 +37,33 @@ function HomePage() {
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
   const [isEditGroupModalOpen, setIsEditGroupModalOpen] = useState(false);
 
+  const [filteredTestCases, setFilteredTestCases] = useState<TestCase[]>([]);
+  const [filteredGroup, setFilteredGroup] = useState<GroupDataProps[]>([]);
+
   useEffect(() => {
     fetchTestCases();
   }, []);
+
+  useEffect(() => {
+    const filteredTestCases = testCases.filter(testCase => {
+      const matchesStatus = selectedStatus === 'all' || testCase.status === selectedStatus;
+      const matchesSearch = testCase.title.toLowerCase().includes(searchTerm.testCase.toLowerCase()) ||
+        testCase.description.toLowerCase().includes(searchTerm.testCase.toLowerCase());
+      return matchesStatus && matchesSearch;
+    });
+    setFilteredTestCases(filteredTestCases);
+  
+    const filteredGroup = groupData.filter((item: GroupDataProps) => {
+      const matchesSearch = item.name.toLowerCase().includes(searchTerm.group.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchTerm.group.toLowerCase()) || item.prefix.toLowerCase().includes(searchTerm.group.toLowerCase());
+  
+      console.log(matchesSearch)
+  
+      return matchesSearch;
+    });
+    setFilteredGroup(filteredGroup);
+
+  }, [searchTerm])
 
   const fetchTestCases = async () => {
     try {
@@ -47,6 +72,9 @@ function HomePage() {
       setTestCases(testCaseContain as TestCase[]);
       setGroupData(groupContain as GroupDataProps[]);
 
+      setFilteredTestCases(testCaseContain as TestCase[]);
+      setFilteredGroup(groupContain as GroupDataProps[]);
+
       setStats(calculateTestStats(testCaseContain as TestCase[]));
 
     } catch (error) {
@@ -54,19 +82,6 @@ function HomePage() {
       alert('Failed to fetch test cases. Please try again.');
     }
   };
-
-  const filteredTestCases = testCases.filter(testCase => {
-    const matchesStatus = selectedStatus === 'all' || testCase.status === selectedStatus;
-    const matchesSearch = testCase.title.toLowerCase().includes(searchTerm.testCase.toLowerCase()) ||
-      testCase.description.toLowerCase().includes(searchTerm.testCase.toLowerCase());
-    return matchesStatus && matchesSearch;
-  });
-
-  const filteredGroup = groupData.filter((item: GroupDataProps) => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.group.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.group.toLowerCase()) || item.prefix.toLowerCase().includes(searchTerm.group.toLowerCase());
-    return matchesSearch;
-  });
 
   const handleSelectTestCase = (testCase: TestCase) => {
     setSelectedTestCase(testCase);
@@ -83,7 +98,7 @@ function HomePage() {
   const handleExportAll = () => {
     exportToExcel({
       groups: groupData,
-      testCases: testCases, 
+      testCases: testCases,
       fileName: 'all-test-cases'
     });
   };
@@ -120,6 +135,13 @@ function HomePage() {
     setSelectedGroup(null);
   };
 
+  const handleSearchChange = (type: 'testCase' | 'group', value: string) => {
+    setSearchTerm(prev => ({
+      ...prev,
+      [type]: value
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
@@ -129,7 +151,8 @@ function HomePage() {
           <Dashboard stats={stats} onExportAll={handleExportAll} />
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        {/* Group Section */}
+        <section className="bg-white rounded-lg shadow-md p-6 mb-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
             <div className="flex items-center gap-4">
               <h2 className="text-2xl font-bold text-gray-800">Group</h2>
@@ -145,19 +168,11 @@ function HomePage() {
             </div>
 
             <div className="flex items-center w-full md:w-auto">
-              <div className="relative flex-grow md:max-w-[300px]">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <input
-                  type="text"
-                  placeholder="Search groups..."
-                  value={searchTerm.group}
-                  onChange={(e) => setSearchTerm((prev) => ({
-                    ...prev,
-                    group: e.target.value,
-                  }))}
-                  className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              <Search
+                type="group"
+                value={searchTerm.group}
+                onChange={handleSearchChange}
+              />
             </div>
           </div>
 
@@ -165,9 +180,10 @@ function HomePage() {
             groupData={filteredGroup}
             onGroupClick={handleGroupClick}
           />
-        </div>
+        </section>
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        {/* Test Case Section */}
+        <section className="bg-white rounded-lg shadow-md p-6 mb-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
             <div className="flex items-center gap-4">
               <h2 className="text-2xl font-bold text-gray-800">Test Cases</h2>
@@ -183,19 +199,11 @@ function HomePage() {
             </div>
 
             <div className="flex items-center w-full md:w-auto">
-              <div className="relative flex-grow md:max-w-[300px]">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <input
-                  type="text"
-                  placeholder="Search test cases..."
-                  value={searchTerm.testCase}
-                  onChange={(e) => setSearchTerm((prev) => ({
-                    ...prev,
-                    testCase: e.target.value,
-                  }))}
-                  className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              <Search
+                type="testCase"
+                value={searchTerm.testCase}
+                onChange={handleSearchChange}
+              />
             </div>
           </div>
 
@@ -207,7 +215,7 @@ function HomePage() {
             testCases={filteredTestCases}
             onSelectTestCase={handleSelectTestCase}
           />
-        </div>
+        </section>
       </main>
 
       {selectedTestCase && (
