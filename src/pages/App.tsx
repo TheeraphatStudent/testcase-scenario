@@ -3,6 +3,8 @@ import HomePage from './Home';
 import LoginPage from './Login';
 import { getSessionItem } from '../utils/useSession';
 import { useState, useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
   const [isAuth, setIsAuth] = useState(false);
@@ -26,6 +28,18 @@ const App = () => {
 
   return (
     <Router>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Routes>
         <Route
           path="/login"

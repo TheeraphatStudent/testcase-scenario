@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TestCase } from '../../../types/TestCase';
 import TestCaseForm from './TestCaseForm';
 import { updateDocument } from '../../../utils/hooks/useFirebaseDB';
+import { showToast } from '../../../utils/toast';
 
 interface TestCaseDetailProps {
   testCase: TestCase;
@@ -18,11 +19,12 @@ const TestCaseDetail: React.FC<TestCaseDetailProps> = ({ testCase, onClose, onTe
         collectionName: 'testCases',
         data: updatedTestCase
       });
+      showToast.success('Test case updated successfully');
       onTestCaseUpdated();
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating test case:', error);
-      alert('Failed to update test case. Please try again.');
+      showToast.error('Failed to update test case. Please try again.');
     }
   };
 

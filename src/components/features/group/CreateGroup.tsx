@@ -1,6 +1,7 @@
 import React from 'react';
 import { createDocument } from '../../../utils/hooks/useFirebaseDB';
 import GroupForm from './GroupForm';
+import { showToast } from '../../../utils/toast';
 
 interface CreateGroupProps {
   onClose: () => void;
@@ -10,9 +11,11 @@ interface CreateGroupProps {
 const CreateGroup: React.FC<CreateGroupProps> = ({ onClose, onGroupCreated }) => {
   const handleSubmit = async (values: { name: string; prefix?: string; description: string }) => {
     if (!values.prefix) {
-      alert('Prefix is required');
+      showToast.warning('Prefix is required');
       return;
     }
+
+    console.log(values)
 
     try {
       await createDocument({
@@ -26,11 +29,12 @@ const CreateGroup: React.FC<CreateGroupProps> = ({ onClose, onGroupCreated }) =>
         }
       });
 
+      showToast.success('Group created successfully');
       onGroupCreated();
       onClose();
     } catch (error) {
       console.error('Error creating group:', error);
-      alert('Failed to create group. Please try again.');
+      showToast.error('Failed to create group. Please try again.');
     }
   };
 

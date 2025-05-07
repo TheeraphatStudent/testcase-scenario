@@ -42,12 +42,15 @@ const GroupForm: React.FC<GroupFormProps> = ({
             onChange={(e) => setName(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          <label className="block text-xs font-light my-1">
+            {!name && 'Enter name'}
+          </label>
         </div>
 
         {!isEditMode && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Prefix (e.g., ABC)
+              Prefix
             </label>
             <input
               type="text"
@@ -56,10 +59,13 @@ const GroupForm: React.FC<GroupFormProps> = ({
               onChange={(e) => setPrefix(e.target.value.toUpperCase())}
               maxLength={6}
               minLength={1}
-              pattern="[A-Za-z]+"
-              title="Only letters are allowed"
+              pattern="[A-Za-z0-9]+"
+              title="Only letters and numbers are allowed"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase"
             />
+            <label className="block text-xs font-light my-1">
+              {prefix ? `${prefix}-XXXXXX` : 'Enter prefix'}
+            </label>
           </div>
         )}
 
@@ -73,6 +79,9 @@ const GroupForm: React.FC<GroupFormProps> = ({
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          <label className="block text-xs font-light my-1">
+            {!description && 'Enter description'}
+          </label>
         </div>
       </div>
 

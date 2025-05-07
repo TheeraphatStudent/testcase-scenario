@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { DEFAULT_IMAGE } from "../config/environment"
 import { removeSessionItem, getSessionItem } from "../utils/useSession"
 import { useNavigate } from "react-router-dom"
-import { getUserByUserId } from "../utils/hooks/useFirebaseDB"
 
 export const Navbar = () => {
   const [profileImage, setProfileImage] = useState<string>(DEFAULT_IMAGE);

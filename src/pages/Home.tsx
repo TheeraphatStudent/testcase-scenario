@@ -16,6 +16,7 @@ import { GroupDataProps } from '../types/Group';
 import { Navbar } from '../components/Navbar';
 import Search from '../components/Search';
 import Footer from '../components/Footer';
+import { showToast } from '../utils/toast';
 
 function HomePage() {
   const [testCases, setTestCases] = useState<TestCase[]>([]);
@@ -88,7 +89,7 @@ function HomePage() {
 
     } catch (error) {
       console.error('Error fetching test cases:', error);
-      alert('Failed to fetch test cases. Please try again.');
+      showToast.error('Failed to fetch test cases. Please try again.');
     }
   };
 
@@ -177,7 +178,14 @@ function HomePage() {
               <h2 className="text-2xl font-bold text-gray-800">Test Cases</h2>
               <div className="flex gap-2">
                 <button
-                  onClick={() => setIsCreateModalOpen(true)}
+                  onClick={() => {
+                    if (groupData.length === 0) {
+                      showToast.warning('Please create a group first');
+                      return;
+                    }
+
+                    setIsCreateModalOpen(true)
+                  }}
                   className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                 >
                   <Plus size={18} />

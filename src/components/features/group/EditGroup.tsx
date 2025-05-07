@@ -1,6 +1,7 @@
 import React from 'react';
 import { updateDocument } from '../../../utils/hooks/useFirebaseDB';
 import GroupForm from './GroupForm';
+import { showToast } from '../../../utils/toast';
 
 interface EditGroupProps {
   onClose: () => void;
@@ -30,11 +31,12 @@ const EditGroup: React.FC<EditGroupProps> = ({
         },
       });
 
+      showToast.success('Group updated successfully');
       onGroupUpdated();
       onClose();
     } catch (error) {
       console.error('Error updating group:', error);
-      alert('Failed to update group. Please try again.');
+      showToast.error('Failed to update group. Please try again.');
     }
   };
 

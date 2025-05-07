@@ -4,6 +4,7 @@ import { Plus, Minus } from 'lucide-react';
 import ImageUpload from '../../ImageUpload';
 import { getCollection } from '../../../utils/hooks/useFirebaseDB';
 import { GroupDataProps } from '../../../types/Group';
+import { showToast } from '../../../utils/toast';
 
 interface TestCaseFormProps {
   initialData?: TestCase;
@@ -49,7 +50,7 @@ const TestCaseForm: React.FC<TestCaseFormProps> = ({ initialData, onClose, onSav
       }
     } catch (error) {
       console.error('Error fetching groups:', error);
-      alert('Failed to fetch groups. Please try again.');
+      showToast.error('Failed to fetch groups. Please try again.');
     }
   };
 
@@ -92,7 +93,7 @@ const TestCaseForm: React.FC<TestCaseFormProps> = ({ initialData, onClose, onSav
     e.preventDefault();
 
     if (!selectedGroup || (mode === 'create' && !nextId)) {
-      alert('Please select a group first');
+      showToast.warning('Please select a group first');
       return;
     }
 
@@ -120,10 +121,11 @@ const TestCaseForm: React.FC<TestCaseFormProps> = ({ initialData, onClose, onSav
       };
 
       onSave(testCaseData);
+      showToast.success(mode === 'create' ? 'Test case created successfully' : 'Test case updated successfully');
       onClose();
     } catch (error) {
       console.error('Error saving test case:', error);
-      alert('Failed to save test case. Please try again.');
+      showToast.error('Failed to save test case. Please try again.');
     }
   };
 

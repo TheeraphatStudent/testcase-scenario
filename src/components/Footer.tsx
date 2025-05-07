@@ -9,8 +9,6 @@ const Footer: React.FC = () => {
       method: 'GET'
     }).then(res => res.json())
 
-    console.log(response)
-
     setGithubInfo(response)
   }
 
@@ -56,7 +54,7 @@ const Footer: React.FC = () => {
           </div>
 
           <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-300">
-            <a className='underline' href="https://github.com/TheeraphatStudent" target="_blank" rel="noopener noreferrer"> &copy; {new Date().getFullYear()} {githubInfo?.name}. All rights reserved.</a>
+            <a className='underline' href="https://github.com/TheeraphatStudent" target="_blank" rel="noopener noreferrer"> &copy; {new Date().getFullYear()} {githubInfo?.name ?? 'Theeraphat Student'}. All rights reserved.</a>
           </div>
         </div>
       </div>

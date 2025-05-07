@@ -1,6 +1,7 @@
 import { googleLogin } from "../utils/hooks/useAuthorize";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { showToast } from "../utils/toast";
 
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,14 +26,17 @@ const LoginPage = () => {
     });
 
     if (response.success) {
+      showToast.success('Login successful');
       navigate('/');
       window.location.reload();
     } else {
-      alert(response.error);
+      showToast.error(response.error?.toString() || 'Login failed');
     }
   };
 
-  fetchGithubInfo();
+  useEffect(() => {
+    fetchGithubInfo();
+  }, []);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -72,7 +76,7 @@ const LoginPage = () => {
         </div>
 
         <div className="pt-4 text-center text-xs text-gray-400">
-          <a className='underline' href="https://github.com/TheeraphatStudent" target="_blank" rel="noopener noreferrer"> &copy; {new Date().getFullYear()} {githubInfo?.name}. All rights reserved.</a>
+          <a className='underline' href="https://github.com/TheeraphatStudent" target="_blank" rel="noopener noreferrer"> &copy; {new Date().getFullYear()} {githubInfo?.name ?? 'Theeraphat Student'}. All rights reserved.</a>
         </div>
       </div>
     </div>

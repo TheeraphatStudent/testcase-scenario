@@ -15,41 +15,48 @@ interface DocumentByIdProps {
 
 export const getCollection = async (collectionName: CollectionNameTypes) => {
   try {
+    const userResponse = await getSessionItem({ name: 'user' });
+    const userId = userResponse.data?.userId;
 
-    const userId = await getSessionItem({ name: 'user' }).then((res) => res.data.uid);
-
-    const querySnapshot = await getDocs(collection(db, collectionName, userId));
+    const collectionRef = collection(db, collectionName);
+    const q = query(collectionRef, where('userId', '==', userId));
+    const querySnapshot = await getDocs(q);
+    
     const fetchData = querySnapshot.docs.map(doc => ({
       ...doc.data()
     }));
 
     return fetchData;
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching collection:', error);
     return [];
-
   }
-
 }
 
 export const createDocument = async ({
   collectionName,
   data
 }: DocumentProps) => {
+  try {
+    const userResponse = await getSessionItem({ name: 'user' });
+    const userId = userResponse.data?.userId;
 
-  const newData = {
-    ...data,
-    userId: getSessionItem({ name: 'user' }).then((res) => res.data.uid),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    const newData = {
+      ...data,
+      userId: userId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+
+    console.log(newData);
+
+    const docRef = await addDoc(collection(db, collectionName), newData);
+    const response = await setDoc(docRef, { id: docRef.id }, { merge: true });
+    return response;
+  } catch (error) {
+    console.error('Error creating document:', error);
+    throw error;
   }
-
-  // console.log(newData);
-
-  const docRef = await addDoc(collection(db, collectionName), newData);
-  const response = await setDoc(docRef, { id: docRef.id }, { merge: true });
-  return response;
-
 }
 
 export const createUser = async ({
@@ -87,15 +94,24 @@ export const updateDocument = async ({
 }: DocumentProps) => {
   try {
     const { id, ...updateData } = data as any;
-    const userId = getSessionItem({ name: 'user' }).then((res) => res.data.uid);
+    const userResponse = await getSessionItem({ name: 'user' });
+    const userId = userResponse.data?.userId;
 
-    const newData = {
-      ...updateData,
-      userId: userId,
-      updatedAt: new Date().toISOString()
+    const collectionRef = collection(db, collectionName);
+    const q = query(collectionRef, where('id', '==', id), where('userId', '==', userId));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      console.error('Document not found or unauthorized');
+      return false;
     }
 
     const docRef = doc(db, collectionName, id);
+    const newData = {
+      ...updateData,
+      updatedAt: new Date().toISOString()
+    };
+
     await updateDoc(docRef, newData);
     return true;
   } catch (error) {
@@ -136,16 +152,21 @@ export const deleteDocumentById = async ({
   id
 }: DocumentByIdProps) => {
   try {
-    const userId = getSessionItem({ name: 'user' }).then((res) => res.data.uid);
-    const docRef = doc(db, collectionName, id);
-    const docSnap = await getDoc(docRef);
-    
-    if (docSnap.exists() && docSnap.data().userId === userId) {
-      await deleteDoc(docRef);
-      return true;
+    const userResponse = await getSessionItem({ name: 'user' });
+    const userId = userResponse.data?.userId;
+
+    const collectionRef = collection(db, collectionName);
+    const q = query(collectionRef, where('id', '==', id), where('userId', '==', userId));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      console.error('Document not found or unauthorized');
+      return false;
     }
 
-    return false;
+    const docRef = doc(db, collectionName, id);
+    await deleteDoc(docRef);
+    return true;
   } catch (error) {
     console.error('Error deleting document:', error);
     return false;
