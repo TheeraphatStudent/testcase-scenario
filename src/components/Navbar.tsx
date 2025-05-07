@@ -1,13 +1,31 @@
-import { DEFAULT_IMAGE, PROFILE_IMAGE } from "../config/environment"
-import { removeSessionItem } from "../utils/useSession"
+import { useState, useEffect } from "react";
+import { DEFAULT_IMAGE } from "../config/environment"
+import { removeSessionItem, getSessionItem } from "../utils/useSession"
+import { useNavigate } from "react-router-dom"
+import { getUserByUserId } from "../utils/hooks/useFirebaseDB"
 
 export const Navbar = () => {
+  const [profileImage, setProfileImage] = useState<string>(DEFAULT_IMAGE);
+  const navigate = useNavigate();
 
   const loggedOut = () => {
     removeSessionItem({ name: 'user' })
     removeSessionItem({ name: 'credential' })
-
+    navigate('/login')
   }
+
+  const fetchProfileImage = async () => {
+    try {
+      const userData = await getSessionItem({ name: 'user' })
+      setProfileImage(`${userData.data.photoURL}?export=view`)
+    } catch (error) {
+      console.error('Error fetching profile image:', error);
+    }
+  }
+
+  useEffect(() => {
+    fetchProfileImage()
+  }, [])
 
   return (
     <header className="bg-white shadow-sm">
@@ -17,7 +35,13 @@ export const Navbar = () => {
           <span className="text-xs">An testcase management service</span>
         </div>
         <div className="flex gap-5 max-h-[44px]">
-          <img className="block w-[44px] h-[44px] rounded-full" src={`${PROFILE_IMAGE || DEFAULT_IMAGE}`} alt="Profile" width={44} height={44} />
+          <img
+            className="block w-[44px] h-[44px] rounded-full"
+            src={profileImage}
+            alt="Profile"
+            width={44}
+            height={44}
+          />
 
           <button onClick={loggedOut} className="relative inline-flex items-center justify-center p-0.5 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400">
             <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white text-orange-500 dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent hover:text-white">
@@ -28,5 +52,4 @@ export const Navbar = () => {
       </div>
     </header>
   )
-
 }

@@ -10,7 +10,7 @@ import CreateGroup from '../components/features/group/CreateGroup';
 import EditGroup from '../components/features/group/EditGroup';
 import { exportToExcel } from '../utils/excelExport';
 import { Plus, FolderPlus } from 'lucide-react';
-import { createDocument, getCollection, updateDocument } from '../utils/hooks/useFirebaseDB';
+import { getCollection } from '../utils/hooks/useFirebaseDB';
 import GroupList from '../components/features/group/GroupList';
 import { GroupDataProps } from '../types/Group';
 import { Navbar } from '../components/Navbar';
@@ -67,7 +67,6 @@ function HomePage() {
   }, [searchTerm])
 
   useEffect(() => {
-    // Add smooth scrolling behavior
     document.documentElement.style.scrollBehavior = 'smooth';
     
     return () => {

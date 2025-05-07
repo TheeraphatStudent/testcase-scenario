@@ -1,4 +1,4 @@
-import { collection, getDocs, addDoc, setDoc, updateDoc, doc, getDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, setDoc, updateDoc, doc, getDoc, deleteDoc, query, where } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { getSessionItem } from '../useSession';
 
@@ -15,7 +15,10 @@ interface DocumentByIdProps {
 
 export const getCollection = async (collectionName: CollectionNameTypes) => {
   try {
-    const querySnapshot = await getDocs(collection(db, collectionName));
+
+    const userId = await getSessionItem({ name: 'user' }).then((res) => res.data.uid);
+
+    const querySnapshot = await getDocs(collection(db, collectionName, userId));
     const fetchData = querySnapshot.docs.map(doc => ({
       ...doc.data()
     }));
@@ -36,14 +39,43 @@ export const createDocument = async ({
 
   const newData = {
     ...data,
-    userId: getSessionItem({ name: 'user' }).data.uid,
+    userId: getSessionItem({ name: 'user' }).then((res) => res.data.uid),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }
 
-  console.log(newData);
+  // console.log(newData);
 
   const docRef = await addDoc(collection(db, collectionName), newData);
+  const response = await setDoc(docRef, { id: docRef.id }, { merge: true });
+  return response;
+
+}
+
+export const createUser = async ({
+  displayName,
+  email,
+  photoURL,
+  userId
+}: {
+  displayName: string | null,
+  email: string | null,
+  photoURL: string | null,
+  userId: string | null
+}) => {
+
+  const newData = {
+    displayName,
+    email,
+    photoURL,
+    userId,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+
+  // console.log(newData);
+
+  const docRef = await addDoc(collection(db, 'users'), newData);
   const response = await setDoc(docRef, { id: docRef.id }, { merge: true });
   return response;
 
@@ -55,7 +87,7 @@ export const updateDocument = async ({
 }: DocumentProps) => {
   try {
     const { id, ...updateData } = data as any;
-    const userId = getSessionItem({ name: 'user' }).data.uid;
+    const userId = getSessionItem({ name: 'user' }).then((res) => res.data.uid);
 
     const newData = {
       ...updateData,
@@ -74,11 +106,29 @@ export const updateDocument = async ({
 
 export const getDocumentById = async ({
   collectionName,
-  id
+  id,
 }: DocumentByIdProps) => {
   const docRef = doc(db, collectionName, id);
   const docSnap = await getDoc(docRef);
   return docSnap.data();
+}
+
+export const getUserByUserId = async ({
+  userId
+}: { userId: string }) => {
+  try {
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('userId', '==', userId));
+    const querySnapshot = await getDocs(q);
+    
+    if (!querySnapshot.empty) {
+      return querySnapshot.docs[0].data();
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting user by userId:', error);
+    return null;
+  }
 }
 
 export const deleteDocumentById = async ({
@@ -86,7 +136,7 @@ export const deleteDocumentById = async ({
   id
 }: DocumentByIdProps) => {
   try {
-    const userId = getSessionItem({ name: 'user' }).data.uid;
+    const userId = getSessionItem({ name: 'user' }).then((res) => res.data.uid);
     const docRef = doc(db, collectionName, id);
     const docSnap = await getDoc(docRef);
     

@@ -1,4 +1,5 @@
 import { ExportProps } from "./useResponse";
+import { OAuth2Client } from 'google-auth-library';
 
 export type SessionTypes = 'user' | 'credential';
 export type ExpireTypes = '1h' | '12h' | '1d';
@@ -14,6 +15,27 @@ interface SetSessionItemProps {
   data: any;
   exp: ExpireTypes;
 }
+
+export const validateToken = async (token: string): Promise<boolean> => {
+  try {
+    if (!token) return false;
+
+    // const client = new OAuth2Client();
+
+    // const ticket = await client.verifyIdToken({
+    //   idToken: token,
+    //   audience: import.meta.env.VITE_GOOGLE_CLIENT_ID
+    // })
+
+    // const decoded = ticket.getPayload();
+    // if (!decoded) return false;
+
+    return true;
+  } catch (error) {
+    console.error('Token validation error:', error);
+    return false;
+  }
+};
 
 export const setSessionItem = ({
   name,
@@ -42,7 +64,7 @@ export const setSessionItem = ({
   }
 };
 
-export const getSessionItem = ({ name }: { name: SessionTypes }): ExportProps => {
+export const getSessionItem = async ({ name }: { name: SessionTypes }): Promise<ExportProps> => {
   try {
     const item = sessionStorage.getItem(name);
 
@@ -61,6 +83,15 @@ export const getSessionItem = ({ name }: { name: SessionTypes }): ExportProps =>
       return {
         data: null,
         message: "Get item fail!, item expired"
+      };
+    }
+
+    if (name === 'credential' && !await validateToken(sessionData.data)) {
+      sessionStorage.removeItem(name);
+      sessionStorage.removeItem('user');
+      return {
+        data: null,
+        message: "Invalid or expired token"
       };
     }
 

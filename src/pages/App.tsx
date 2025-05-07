@@ -2,15 +2,22 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import HomePage from './Home';
 import LoginPage from './Login';
 import { getSessionItem } from '../utils/useSession';
+import { useState, useEffect } from 'react';
 
 const App = () => {
-  const isAuthenticated = () => {
-    const response = getSessionItem({ name: 'credential' });
-    return Boolean(response.data);
-  };
+  const [isAuth, setIsAuth] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const response = await getSessionItem({ name: 'credential' });
+      setIsAuth(Boolean(response.data));
+    };
+
+    checkAuth();
+  }, []);
 
   const ProtectedRoute = ({ children }: { children: any }) => {
-    if (!isAuthenticated()) {
+    if (!isAuth) {
       return <Navigate to="/login" />;
     }
 
@@ -22,7 +29,7 @@ const App = () => {
       <Routes>
         <Route
           path="/login"
-          element={isAuthenticated() ? <Navigate to="/" /> : <LoginPage />}
+          element={isAuth ? <Navigate to="/" /> : <LoginPage />}
         />
 
         <Route
@@ -36,7 +43,7 @@ const App = () => {
 
         <Route
           path="*"
-          element={isAuthenticated() ? <Navigate to="/" /> : <Navigate to="/login" />}
+          element={isAuth ? <Navigate to="/" /> : <Navigate to="/login" />}
         />
       </Routes>
     </Router>

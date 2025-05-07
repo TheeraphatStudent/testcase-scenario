@@ -1,6 +1,7 @@
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { setSessionItem } from "../useSession";
-import { createDocument, getDocumentById } from "./useFirebaseDB";
+import { createDocument, createUser, getUserByUserId } from "./useFirebaseDB";
+import { DEFAULT_IMAGE } from "../../config/environment";
 
 export const googleLogin = async () => {
   try {
@@ -14,26 +15,27 @@ export const googleLogin = async () => {
     const token = credential?.accessToken;
     const user = result.user;
 
-    const userData = await getDocumentById({
-      collectionName: "users",
-      id: user.uid
+    const userData = await getUserByUserId({
+      userId: user.uid
     })
 
-    if (!userData) {
-      await createDocument({
-        collectionName: "users",
-        data: {
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-          id: user.uid
-        }
-      })
+    const userObj = {
+      displayName: user?.displayName,
+      email: user?.email,
+      photoURL: user?.photoURL ?? DEFAULT_IMAGE,
+      userId: user?.uid
     }
-    
+
+    if (!userData) {
+      await createUser(userObj)  
+    }
+
     setSessionItem({
       name: 'user',
-      data: user, 
+      data: {
+        ...userData,
+        ...userObj
+      }, 
       exp: '1d'
     });
     
@@ -43,9 +45,9 @@ export const googleLogin = async () => {
       exp: '1d'
     });
     
-    return { success: true, user };
+    return { success: true, error: null };
   } catch (error) {
     console.error("Google login error:", error);
-    return { success: false, error };
+    return { success: false, error: error };
   }
 };

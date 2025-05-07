@@ -1,26 +1,46 @@
 import { googleLogin } from "../utils/hooks/useAuthorize";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [githubInfo, setGithubInfo] = useState<any>({});
+  const navigate = useNavigate();
 
-  const handleGoogleLogin = () => {
+  const fetchGithubInfo = async () => {
+    const response = await fetch(import.meta.env.VITE_GITHUB_INFO, {
+      method: 'GET'
+    }).then(res => res.json())
+
+    console.log(response)
+
+    setGithubInfo(response)
+  }
+
+  const handleGoogleLogin = async () => {
     setIsLoading(true);
 
-    googleLogin().finally(() => {
+    const response = await googleLogin().finally(() => {
       setIsLoading(false);
-      if (window) {
-        window.location.reload();
-      }
-
     });
+
+    if (response.success) {
+      navigate('/');
+      window.location.reload();
+    } else {
+      alert(response.error);
+    }
   };
+
+  fetchGithubInfo();
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-lg">
+      <div className="flex flex-col items-center justify-center w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-lg">
+        <img src={githubInfo?.avatar_url} alt="github" className='w-24 h-24 rounded-full' />
+
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-800">Welcome Back</h1>
+          <h1 className="text-3xl font-bold text-gray-800">TCM, Welcome</h1>
           <p className="mt-2 text-gray-600">Sign in to continue to your account</p>
         </div>
 
@@ -43,16 +63,16 @@ const LoginPage = () => {
             <span>{isLoading ? "Connecting..." : "Sign in with Google"}</span>
           </button>
 
-          <div className="flex items-center justify-center">
+          {/* <div className="flex items-center justify-center">
             <span className="text-sm text-gray-500">Don't have an account?</span>
             <a href="#" className="ml-1 text-sm font-medium text-blue-600 hover:text-blue-500">
               Sign up
             </a>
-          </div>
+          </div> */}
         </div>
 
         <div className="pt-4 text-center text-xs text-gray-400">
-          By continuing, you agree to our Terms of Service and Privacy Policy
+          <a className='underline' href="https://github.com/TheeraphatStudent" target="_blank" rel="noopener noreferrer"> &copy; {new Date().getFullYear()} {githubInfo?.name}. All rights reserved.</a>
         </div>
       </div>
     </div>
