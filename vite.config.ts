@@ -11,6 +11,9 @@ import path from 'path';
 // });
 
 export default defineConfig({
+  define: {
+    __APP_ENV__: process.env.VITE_VERCEL_ENV,
+  },
   plugins: [react()],
   resolve: {
     alias: {
@@ -18,7 +21,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: process.env.PORT ? parseInt(process.env.PORT) : 3000,
     strictPort: true,
     host: true,
     open: true
