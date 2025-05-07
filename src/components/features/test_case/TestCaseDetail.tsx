@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { TestCase } from '../../../types/TestCase';
 import TestCaseForm from './TestCaseForm';
-import { updateDocument } from '../../../utils/hooks/useFirebaseDB';
 
 interface TestCaseDetailProps {
   testCase: TestCase;

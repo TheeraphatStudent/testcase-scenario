@@ -15,6 +15,7 @@ import GroupList from '../components/features/group/GroupList';
 import { GroupDataProps } from '../types/Group';
 import { Navbar } from '../components/Navbar';
 import Search from '../components/Search';
+import Footer from '../components/Footer';
 
 function HomePage() {
   const [testCases, setTestCases] = useState<TestCase[]>([]);
@@ -64,6 +65,15 @@ function HomePage() {
     setFilteredGroup(filteredGroup);
 
   }, [searchTerm])
+
+  useEffect(() => {
+    // Add smooth scrolling behavior
+    document.documentElement.style.scrollBehavior = 'smooth';
+    
+    return () => {
+      document.documentElement.style.scrollBehavior = 'auto';
+    };
+  }, []);
 
   const fetchTestCases = async () => {
     try {
@@ -143,10 +153,10 @@ function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 flex flex-col pb-[350px]">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="flex-grow container mx-auto px-4 py-8">
         <div className="mb-8">
           <Dashboard stats={stats} onExportAll={handleExportAll} />
         </div>
@@ -254,6 +264,8 @@ function HomePage() {
           }}
         />
       )}
+
+      <Footer />
     </div>
   );
 }
