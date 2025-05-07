@@ -11,9 +11,18 @@ type ThemeColors = {
     primary: string;
     secondary: string;
   };
+  form: {
+    input: string;
+    inputText: string;
+    label: string;
+    border: string;
+    focus: string;
+  };
 };
 
-const themeColors: Record<string, ThemeColors> = {
+type Colors = 'yellow' | 'white' | 'black';
+
+const themeColors: Record<Colors, ThemeColors> = {
   yellow: {
     background: 'bg-yellow-50',
     text: 'text-gray-900',
@@ -22,6 +31,13 @@ const themeColors: Record<string, ThemeColors> = {
     button: {
       primary: 'bg-yellow-500 hover:bg-yellow-600 text-white',
       secondary: 'bg-yellow-200 hover:bg-yellow-300 text-gray-900',
+    },
+    form: {
+      input: 'bg-white',
+      inputText: 'text-gray-900',
+      label: 'text-yellow-900',
+      border: 'border-yellow-200',
+      focus: 'focus:ring-yellow-500',
     },
   },
   white: {
@@ -33,6 +49,13 @@ const themeColors: Record<string, ThemeColors> = {
       primary: 'bg-blue-600 hover:bg-blue-700 text-white',
       secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-900',
     },
+    form: {
+      input: 'bg-white',
+      inputText: 'text-gray-900',
+      label: 'text-gray-900',
+      border: 'border-gray-300',
+      focus: 'focus:ring-blue-500',
+    },
   },
   black: {
     background: 'bg-gray-900',
@@ -42,6 +65,13 @@ const themeColors: Record<string, ThemeColors> = {
     button: {
       primary: 'bg-gray-700 hover:bg-gray-600 text-white',
       secondary: 'bg-gray-600 hover:bg-gray-500 text-white',
+    },
+    form: {
+      input: 'bg-gray-700',
+      inputText: 'text-white',
+      label: 'text-gray-100',
+      border: 'border-gray-600',
+      focus: 'focus:ring-gray-500',
     },
   },
 };

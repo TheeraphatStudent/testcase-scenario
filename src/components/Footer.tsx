@@ -13,7 +13,7 @@ const Footer: React.FC = () => {
   }
 
   const onReportIssue = () => {
-    window.open('https://github.com/TheeraphatStudent/TCM/issues', '_blank')
+    window.open('https://github.com/TheeraphatStudent/testcase-scenario/issues/new', '_blank')
   }
 
   useEffect(() => {
