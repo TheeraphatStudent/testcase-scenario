@@ -4,6 +4,9 @@ import LoginPage from './Login';
 import { getSessionItem } from '../utils/useSession';
 import { useState, useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
+import { Provider } from 'react-redux';
+import { store } from '../store/store';
+import { ThemeProvider } from '../context/ThemeContext';
 import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
@@ -27,40 +30,44 @@ const App = () => {
   };
 
   return (
-    <Router>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-      <Routes>
-        <Route
-          path="/login"
-          element={isAuth ? <Navigate to="/" /> : <LoginPage />}
-        />
+    <Provider store={store}>
+      <ThemeProvider>
+        <Router>
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
+          <Routes>
+            <Route
+              path="/login"
+              element={isAuth ? <Navigate to="/" /> : <LoginPage />}
+            />
 
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <HomePage />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <HomePage />
+                </ProtectedRoute>
+              }
+            />
 
-        <Route
-          path="*"
-          element={isAuth ? <Navigate to="/" /> : <Navigate to="/login" />}
-        />
-      </Routes>
-    </Router>
+            <Route
+              path="*"
+              element={isAuth ? <Navigate to="/" /> : <Navigate to="/login" />}
+            />
+          </Routes>
+        </Router>
+      </ThemeProvider>
+    </Provider>
   );
 };
 

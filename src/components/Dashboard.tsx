@@ -2,6 +2,7 @@ import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { TestStats } from '../types/TestCase';
 import { CheckCircle, XCircle, Clock, Play } from 'lucide-react';
+import { useThemeColors } from '../context/ThemeContext';
 
 interface DashboardProps {
   stats: TestStats;
@@ -9,6 +10,8 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ stats, onExportAll }) => {
+  const colors = useThemeColors();
+  
   const chartData = [
     { name: 'Pass', value: stats.pass, color: '#10B981' },
     { name: 'Fail', value: stats.fail, color: '#EF4444' },
@@ -26,8 +29,8 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, onExportAll }) => {
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-2 shadow-md rounded border border-gray-200">
-          <p className="font-medium">{`${payload[0].name}: ${payload[0].value}`}</p>
+        <div className={`${colors.card} p-2 shadow-md rounded border border-gray-200`}>
+          <p className={`font-medium ${colors.cardText}`}>{`${payload[0].name}: ${payload[0].value}`}</p>
           <p className="text-sm text-gray-500">{`${((payload[0].value / stats.total) * 100).toFixed(1)}%`}</p>
         </div>
       );
@@ -36,12 +39,12 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, onExportAll }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className={`${colors.card} rounded-lg shadow-md p-6`}>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Test Results Summary</h2>
+        <h2 className={`text-2xl font-bold ${colors.cardText}`}>Test Results Summary</h2>
         <button
           onClick={onExportAll}
-          className="mt-2 md:mt-0 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          className={`mt-2 md:mt-0 px-4 py-2 ${colors.button.primary} rounded-md transition-colors`}
         >
           Export 
         </button>
@@ -93,10 +96,10 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, onExportAll }) => {
             })}
           </div>
           
-          <div className="mt-4 p-4 bg-gray-100 rounded-lg">
+          <div className={`mt-4 p-4 ${colors.background} rounded-lg`}>
             <div className="flex justify-between items-center">
-              <span className="font-medium">Total</span>
-              <span className="text-2xl font-bold">{stats.total}</span>
+              <span className={`font-medium ${colors.text}`}>Total</span>
+              <span className={`text-2xl font-bold ${colors.text}`}>{stats.total}</span>
             </div>
           </div>
         </div>

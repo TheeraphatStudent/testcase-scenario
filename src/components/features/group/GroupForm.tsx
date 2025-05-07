@@ -3,10 +3,10 @@ import React from 'react';
 interface GroupFormProps {
   initialValues?: {
     name: string;
-    prefix?: string;
+    prefix: string;
     description: string;
   };
-  onSubmit: (values: { name: string; prefix?: string; description: string }) => void;
+  onSubmit: (values: { name: string; prefix: string; description: string }) => void;
   onCancel: () => void;
   submitButtonText?: string;
   isEditMode?: boolean;
@@ -20,7 +20,7 @@ const GroupForm: React.FC<GroupFormProps> = ({
   isEditMode = false,
 }) => {
   const [name, setName] = React.useState(initialValues.name);
-  const [prefix, setPrefix] = React.useState(initialValues.prefix || '');
+  const [prefix, setPrefix] = React.useState(initialValues.prefix);
   const [description, setDescription] = React.useState(initialValues.description);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -47,27 +47,25 @@ const GroupForm: React.FC<GroupFormProps> = ({
           </label>
         </div>
 
-        {!isEditMode && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Prefix
-            </label>
-            <input
-              type="text"
-              required
-              value={prefix}
-              onChange={(e) => setPrefix(e.target.value.toUpperCase())}
-              maxLength={6}
-              minLength={1}
-              pattern="[A-Za-z0-9]+"
-              title="Only letters and numbers are allowed"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase"
-            />
-            <label className="block text-xs font-light my-1">
-              {prefix ? `${prefix}-XXXXXX` : 'Enter prefix'}
-            </label>
-          </div>
-        )}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Prefix
+          </label>
+          <input
+            type="text"
+            required
+            value={prefix}
+            onChange={(e) => setPrefix(e.target.value.toUpperCase())}
+            maxLength={6}
+            minLength={1}
+            pattern="[A-Za-z0-9]+"
+            title="Only letters and numbers are allowed"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase"
+          />
+          <label className="block text-xs font-light my-1">
+            {prefix ? `${prefix}-XXXXXX` : 'Enter prefix'}
+          </label>
+        </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">

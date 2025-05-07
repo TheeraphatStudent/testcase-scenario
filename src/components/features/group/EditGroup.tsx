@@ -10,6 +10,7 @@ interface EditGroupProps {
   initialValues: {
     name: string;
     description: string;
+    prefix: string;
   };
 }
 
@@ -19,7 +20,7 @@ const EditGroup: React.FC<EditGroupProps> = ({
   groupId,
   initialValues,
 }) => {
-  const handleSubmit = async (values: { name: string; description: string }) => {
+  const handleSubmit = async (values: { name: string; description: string; prefix: string }) => {
     try {
       await updateDocument({
         collectionName: 'groups',
@@ -27,6 +28,7 @@ const EditGroup: React.FC<EditGroupProps> = ({
           id: groupId,
           name: values.name,
           description: values.description,
+          prefix: values.prefix,
           updatedAt: new Date().toISOString(),
         },
       });
