@@ -3,6 +3,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../config/firebase';
 import { v4 as uuidv4 } from 'uuid';
 import { ImagePlus, X } from 'lucide-react';
+import { showToast } from '../utils/toast';
 
 interface ImageUploadProps {
   images: string[];
@@ -29,9 +30,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, label }) =>
       }
 
       onChange([...images, ...newUrls]);
+      showToast.success('Images uploaded successfully');
     } catch (error) {
       console.error('Error uploading images:', error);
-      alert('Failed to upload images. Please try again.');
+      showToast.error('Failed to upload images. Please try again.');
     } finally {
       setUploading(false);
     }

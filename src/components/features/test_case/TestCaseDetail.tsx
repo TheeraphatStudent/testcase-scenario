@@ -1,27 +1,58 @@
-import React from 'react';
-import { CheckCircle, XCircle, Clock, Play, Download } from 'lucide-react';
-import { exportToExcel } from '../../../utils/excelExport';
+import React, { useState } from 'react';
 import { TestCase } from '../../../types/TestCase';
+import TestCaseForm from './TestCaseForm';
+import { updateDocument } from '../../../utils/hooks/useFirebaseDB';
+import { showToast } from '../../../utils/toast';
 
 interface TestCaseDetailProps {
   testCase: TestCase;
   onClose: () => void;
+  onTestCaseUpdated: () => void;
 }
 
-const statusConfig = {
-  pass: { icon: CheckCircle, color: 'text-green-500', bgColor: 'bg-green-100', label: 'Pass' },
-  fail: { icon: XCircle, color: 'text-red-500', bgColor: 'bg-red-100', label: 'Fail' },
-  pending: { icon: Clock, color: 'text-yellow-500', bgColor: 'bg-yellow-100', label: 'Pending' },
-  inProgress: { icon: Play, color: 'text-blue-500', bgColor: 'bg-blue-100', label: 'In Progress' }
-};
+const TestCaseDetail: React.FC<TestCaseDetailProps> = ({ testCase, onClose, onTestCaseUpdated }) => {
+  const [isEditing, setIsEditing] = useState(false);
 
-const TestCaseDetail: React.FC<TestCaseDetailProps> = ({ testCase, onClose }) => {
-  const { icon: StatusIcon, color, label } = statusConfig[testCase.status];
-  
-  const handleExport = () => {
-    exportToExcel([testCase], `test-case-${testCase.jobId}`);
+  const handleSave = async (updatedTestCase: TestCase) => {
+    try {
+      await updateDocument({
+        collectionName: 'testCases',
+        data: updatedTestCase
+      });
+      showToast.success('Test case updated successfully');
+      onTestCaseUpdated();
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating test case:', error);
+      showToast.error('Failed to update test case. Please try again.');
+    }
   };
-  
+
+  if (isEditing) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
+            <h2 className="text-xl font-bold text-gray-800">Edit Test Case</h2>
+            <button
+              onClick={() => setIsEditing(false)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+          </div>
+
+          <TestCaseForm
+            initialData={testCase}
+            onClose={() => setIsEditing(false)}
+            onSave={handleSave}
+            mode="edit"
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -39,21 +70,22 @@ const TestCaseDetail: React.FC<TestCaseDetailProps> = ({ testCase, onClose }) =>
           <div className="flex justify-between items-start mb-4">
             <h1 className="text-2xl font-bold text-gray-900">{testCase.title}</h1>
             <button
-              onClick={handleExport}
-              className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100 transition-colors"
+              onClick={() => setIsEditing(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
-              <Download size={16} />
-              <span>Export</span>
+              Edit
             </button>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
+              <h3 className="text-sm font-medium text-gray-500 mb-1">Test Case ID</h3>
+              <span>{testCase.jobId}</span>
+            </div>
+            
+            <div>
               <h3 className="text-sm font-medium text-gray-500 mb-1">Status</h3>
-              <div className={`inline-flex items-center gap-1.5 ${color} text-sm font-medium`}>
-                <StatusIcon size={18} />
-                <span>{label}</span>
-              </div>
+              <span className="capitalize">{testCase.status === 'inProgress' ? 'In Progress' : testCase.status}</span>
             </div>
             
             <div>
@@ -97,6 +129,38 @@ const TestCaseDetail: React.FC<TestCaseDetailProps> = ({ testCase, onClose }) =>
               <p className="text-gray-700">{testCase.actualResult || 'Not recorded'}</p>
             </div>
           </div>
+
+          {testCase.beforeTestImages && testCase.beforeTestImages.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-md font-semibold text-gray-800 mb-2">Before Test Images</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {testCase.beforeTestImages.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`Before test ${index + 1}`}
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {testCase.afterTestImages && testCase.afterTestImages.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-md font-semibold text-gray-800 mb-2">After Test Images</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {testCase.afterTestImages.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`After test ${index + 1}`}
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         
         <div className="sticky bottom-0 bg-gray-50 p-4 border-t flex justify-end">

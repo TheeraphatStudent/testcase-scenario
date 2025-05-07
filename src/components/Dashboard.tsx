@@ -43,7 +43,7 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, onExportAll }) => {
           onClick={onExportAll}
           className="mt-2 md:mt-0 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
         >
-          Export All Results
+          Export 
         </button>
       </div>
       
