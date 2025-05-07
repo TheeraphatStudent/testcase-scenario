@@ -6,9 +6,12 @@ import { DEFAULT_IMAGE } from "../../config/environment";
 export const googleLogin = async () => {
   try {
     const provider = new GoogleAuthProvider();
-    provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+    
+    provider.addScope('https://www.googleapis.com/auth/userinfo.profile');
+    provider.addScope('https://www.googleapis.com/auth/userinfo.email');
+    
     provider.setCustomParameters({
-      redirect_uri: window.location.origin
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID
     });
     
     const auth = getAuth();
