@@ -1,6 +1,6 @@
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { setSessionItem } from "../useSession";
-import { createDocument, createUser, getUserByUserId } from "./useFirebaseDB";
+import { createUser, getUserByUserId } from "./useFirebaseDB";
 import { DEFAULT_IMAGE } from "../../config/environment";
 
 export const googleLogin = async () => {
