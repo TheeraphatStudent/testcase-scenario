@@ -1,5 +1,5 @@
 export interface GroupDataProps {
-  id?: string;
+  id: string;
   name: string,
   prefix: string,
   description: string,
