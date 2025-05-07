@@ -7,6 +7,7 @@ export interface TestCaseListProps {
 }
 
 export interface TestCase {
+  id: string; 
   jobId: string;
   groupId: string;
   title: string;
