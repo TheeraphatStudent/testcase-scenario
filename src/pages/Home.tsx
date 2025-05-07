@@ -7,6 +7,7 @@ import TestCaseDetail from '../components/features/test_case/TestCaseDetail';
 import StatusFilter from '../components/StatusFilter';
 import CreateTestCase from '../components/features/test_case/CreateTestCase';
 import CreateGroup from '../components/features/group/CreateGroup';
+import EditGroup from '../components/features/group/EditGroup';
 import { exportToExcel } from '../utils/excelExport';
 import { Search, Plus, FolderPlus } from 'lucide-react';
 import { createDocument, getCollection, updateDocument } from '../utils/hooks/useFirebaseDB';
@@ -20,6 +21,7 @@ function HomePage() {
 
   const [selectedTestCase, setSelectedTestCase] = useState<TestCase | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<TestStatus | 'all'>('all');
+  const [selectedGroup, setSelectedGroup] = useState<GroupDataProps | null>(null);
 
   const [searchTerm, setSearchTerm] = useState<{
     testCase: string;
@@ -32,6 +34,7 @@ function HomePage() {
   const [stats, setStats] = useState(calculateTestStats(testCases));
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
+  const [isEditGroupModalOpen, setIsEditGroupModalOpen] = useState(false);
 
   useEffect(() => {
     fetchTestCases();
@@ -78,7 +81,11 @@ function HomePage() {
   };
 
   const handleExportAll = () => {
-    exportToExcel(filteredTestCases, 'all-test-cases');
+    exportToExcel({
+      groups: groupData,
+      testCases: testCases, 
+      fileName: 'all-test-cases'
+    });
   };
 
   const onCreateTestCase = async (newTestCase: TestCase) => {
@@ -100,6 +107,17 @@ function HomePage() {
       data: updatedTestCase
     });
     await fetchTestCases();
+  };
+
+  const handleGroupClick = (group: GroupDataProps) => {
+    setSelectedGroup(group);
+    setIsEditGroupModalOpen(true);
+  };
+
+  const handleGroupUpdated = async () => {
+    await fetchTestCases();
+    setIsEditGroupModalOpen(false);
+    setSelectedGroup(null);
   };
 
   return (
@@ -131,7 +149,7 @@ function HomePage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                 <input
                   type="text"
-                  placeholder="Search test cases..."
+                  placeholder="Search groups..."
                   value={searchTerm.group}
                   onChange={(e) => setSearchTerm((prev) => ({
                     ...prev,
@@ -145,6 +163,7 @@ function HomePage() {
 
           <GroupList
             groupData={filteredGroup}
+            onGroupClick={handleGroupClick}
           />
         </div>
 
@@ -210,6 +229,21 @@ function HomePage() {
         <CreateGroup
           onClose={() => setIsCreateGroupModalOpen(false)}
           onGroupCreated={fetchTestCases}
+        />
+      )}
+
+      {isEditGroupModalOpen && selectedGroup && (
+        <EditGroup
+          onClose={() => {
+            setIsEditGroupModalOpen(false);
+            setSelectedGroup(null);
+          }}
+          onGroupUpdated={handleGroupUpdated}
+          groupId={selectedGroup.id}
+          initialValues={{
+            name: selectedGroup.name,
+            description: selectedGroup.description
+          }}
         />
       )}
     </div>

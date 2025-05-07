@@ -1,10 +1,13 @@
-import { collection, getDocs, addDoc, setDoc, updateDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, setDoc, updateDoc, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 
 type CollectionNameTypes = 'testCases' | 'groups';
 interface DocumentProps {
   collectionName: CollectionNameTypes;
   data: any
+}
+interface GroupProps {
+  id: string;
 }
 
 export const getCollection = async (collectionName: CollectionNameTypes) => {
@@ -45,4 +48,12 @@ export const updateDocument = async ({
     console.error('Error updating document:', error);
     return false;
   }
+}
+
+export const getGroupById = async ({
+  id
+}: GroupProps) => {
+  const docRef = doc(db, 'groups', id);
+  const docSnap = await getDoc(docRef);
+  return docSnap.data();
 }

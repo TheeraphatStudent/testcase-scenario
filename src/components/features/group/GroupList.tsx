@@ -12,13 +12,12 @@ import { GroupDataProps } from '../../../types/Group';
 
 interface GroupListProps {
   groupData: GroupDataProps[];
-
+  onGroupClick: (group: GroupDataProps) => void;
 }
-
-
 
 const GroupList: React.FC<GroupListProps> = ({
   groupData,
+  onGroupClick,
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -32,11 +31,10 @@ const GroupList: React.FC<GroupListProps> = ({
             return (
               <GroupCard
                 groupData={item}
-                onClick={() => { }}
+                onClick={() => onGroupClick(item)}
                 key={`group-card-${index}`}
               />
             )
-
           }
         })
       )}
