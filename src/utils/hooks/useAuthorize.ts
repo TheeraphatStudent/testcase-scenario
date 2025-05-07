@@ -7,6 +7,9 @@ export const googleLogin = async () => {
   try {
     const provider = new GoogleAuthProvider();
     provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+    provider.setCustomParameters({
+      redirect_uri: window.location.origin
+    });
     
     const auth = getAuth();
     const result = await signInWithPopup(auth, provider);
