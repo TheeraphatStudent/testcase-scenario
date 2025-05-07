@@ -17,8 +17,11 @@ import { Navbar } from '../components/Navbar';
 import Search from '../components/Search';
 import Footer from '../components/Footer';
 import { showToast } from '../utils/toast';
+import { Seggested } from '../components/Seggested';
+import { useThemeColors } from '../context/ThemeContext';
 
 function HomePage() {
+  const colors = useThemeColors();
   const [testCases, setTestCases] = useState<TestCase[]>([]);
   const [groupData, setGroupData] = useState<GroupDataProps[]>([]);
 
@@ -132,7 +135,7 @@ function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col pb-[350px]">
+    <div className={`min-h-screen ${colors.background} flex flex-col pb-[350px]`}>
       <Navbar />
 
       <main className="flex-grow container mx-auto px-4 py-8">
@@ -141,14 +144,14 @@ function HomePage() {
         </div>
 
         {/* Group Section */}
-        <section className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <section className={`${colors.card} rounded-lg shadow-md p-6 mb-8`}>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
             <div className="flex items-center gap-4">
-              <h2 className="text-2xl font-bold text-gray-800">Group</h2>
+              <h2 className={`text-2xl font-bold ${colors.cardText}`}>Group</h2>
               <div className="flex gap-2">
                 <button
                   onClick={() => setIsCreateGroupModalOpen(true)}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                  className={`inline-flex items-center gap-1 px-3 py-1.5 ${colors.button.primary} rounded-md transition-colors`}
                 >
                   <FolderPlus size={18} />
                   <span>New Group</span>
@@ -172,10 +175,10 @@ function HomePage() {
         </section>
 
         {/* Test Case Section */}
-        <section className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <section className={`${colors.card} rounded-lg shadow-md p-6 mb-8`}>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
             <div className="flex items-center gap-4">
-              <h2 className="text-2xl font-bold text-gray-800">Test Cases</h2>
+              <h2 className={`text-2xl font-bold ${colors.cardText}`}>Test Cases</h2>
               <div className="flex gap-2">
                 <button
                   onClick={() => {
@@ -183,10 +186,9 @@ function HomePage() {
                       showToast.warning('Please create a group first');
                       return;
                     }
-
                     setIsCreateModalOpen(true)
                   }}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  className={`inline-flex items-center gap-1 px-3 py-1.5 ${colors.button.primary} rounded-md transition-colors`}
                 >
                   <Plus size={18} />
                   <span>New Test Case</span>
@@ -213,6 +215,8 @@ function HomePage() {
           />
         </section>
       </main>
+
+      <Seggested />
 
       {selectedTestCase && (
         <TestCaseDetail
@@ -246,7 +250,8 @@ function HomePage() {
           groupId={selectedGroup.id}
           initialValues={{
             name: selectedGroup.name,
-            description: selectedGroup.description
+            description: selectedGroup.description,
+            prefix: selectedGroup.prefix,
           }}
         />
       )}

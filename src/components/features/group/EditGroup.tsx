@@ -2,6 +2,7 @@ import React from 'react';
 import { updateDocument } from '../../../utils/hooks/useFirebaseDB';
 import GroupForm from './GroupForm';
 import { showToast } from '../../../utils/toast';
+import { useThemeColors } from '../../../context/ThemeContext';
 
 interface EditGroupProps {
   onClose: () => void;
@@ -10,6 +11,7 @@ interface EditGroupProps {
   initialValues: {
     name: string;
     description: string;
+    prefix: string;
   };
 }
 
@@ -19,7 +21,9 @@ const EditGroup: React.FC<EditGroupProps> = ({
   groupId,
   initialValues,
 }) => {
-  const handleSubmit = async (values: { name: string; description: string }) => {
+  const colors = useThemeColors();
+
+  const handleSubmit = async (values: { name: string; description: string; prefix: string }) => {
     try {
       await updateDocument({
         collectionName: 'groups',
@@ -27,6 +31,7 @@ const EditGroup: React.FC<EditGroupProps> = ({
           id: groupId,
           name: values.name,
           description: values.description,
+          prefix: values.prefix,
           updatedAt: new Date().toISOString(),
         },
       });
@@ -41,13 +46,13 @@ const EditGroup: React.FC<EditGroupProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-        <div className="p-4 border-b flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-800">Edit Group</h2>
+    <div className={`fixed inset-0 ${colors.form.input} bg-opacity-50 flex items-center justify-center z-50 p-4`}>
+      <div className={`${colors.card} rounded-lg shadow-xl max-w-md w-full`}>
+        <div className={`p-4 border-b flex justify-between items-center ${colors.card}`}>
+          <h2 className={`text-xl font-bold ${colors.cardText}`}>Edit Group</h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className={`${colors.text} hover:opacity-70`}
           >
             ✕
           </button>
@@ -58,7 +63,6 @@ const EditGroup: React.FC<EditGroupProps> = ({
           onSubmit={handleSubmit}
           onCancel={onClose}
           submitButtonText="Update Group"
-          isEditMode={true}
         />
       </div>
     </div>
